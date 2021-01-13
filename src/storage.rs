@@ -54,7 +54,7 @@ impl VStorage {
         }
     }
 
-    pub(crate) fn new_lmdb(db_path: &str, mode: StorageMode) -> VStorage {
+    pub fn new_lmdb(db_path: &str, mode: StorageMode) -> VStorage {
         VStorage {
             storage: EStorage::LMDB(LMDBStorage::new(db_path, mode)),
         }
