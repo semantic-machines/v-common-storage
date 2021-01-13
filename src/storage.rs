@@ -48,7 +48,7 @@ impl VStorage {
         }
     }
 
-    pub(crate) fn new_tt(tt_id: String, login: &str, pass: &str) -> VStorage {
+    pub fn new_tt(tt_id: String, login: &str, pass: &str) -> VStorage {
         VStorage {
             storage: EStorage::TT(TTStorage::new(tt_id, login, pass)),
         }
