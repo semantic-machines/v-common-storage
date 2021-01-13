@@ -116,3 +116,41 @@ impl VStorage {
         }
     }
 }
+
+pub fn new_ro_storage() -> VStorage {
+    let conf = Ini::load_from_file("veda.properties").expect("fail load [veda.properties] file");
+    let section = conf.section(None::<String>).expect("fail parse veda.properties");
+    let tarantool_addr = if let Some(p) = section.get("tarantool_url") {
+        p.to_owned()
+    } else {
+        warn!("param [tarantool_url] not found in veda.properties");
+        "".to_owned()
+    };
+
+    let storage = if !tarantool_addr.is_empty() {
+        VStorage::new_tt(tarantool_addr, "veda6", "123456")
+    } else {
+        VStorage::new_lmdb("./data", StorageMode::ReadOnly)
+    };
+
+    storage
+}
+
+pub fn new_rw_storage() -> VStorage {
+    let conf = Ini::load_from_file("veda.properties").expect("fail load [veda.properties] file");
+    let section = conf.section(None::<String>).expect("fail parse veda.properties");
+    let tarantool_addr = if let Some(p) = section.get("tarantool_url") {
+        p.to_owned()
+    } else {
+        warn!("param [tarantool_url] not found in veda.properties");
+        "".to_owned()
+    };
+
+    let storage = if !tarantool_addr.is_empty() {
+        VStorage::new_tt(tarantool_addr, "veda6", "123456")
+    } else {
+        VStorage::new_lmdb("./data", StorageMode::ReadWrite)
+    };
+
+    storage
+}
