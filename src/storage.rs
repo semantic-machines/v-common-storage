@@ -26,6 +26,7 @@ pub(crate) enum EStorage {
     LMDB(LMDBStorage),
     TT(TTStorage),
     REMOTE(StorageROClient),
+    NONE
 }
 
 pub trait Storage {
@@ -42,6 +43,12 @@ pub struct VStorage {
 }
 
 impl VStorage {
+    pub fn none() -> VStorage {
+        VStorage {
+            storage: EStorage::NONE,
+        }
+    }
+
     pub fn new_remote(addr: &str) -> VStorage {
         VStorage {
             storage: EStorage::REMOTE(StorageROClient::new(addr)),
@@ -65,6 +72,7 @@ impl VStorage {
             EStorage::TT(s) => s.get_individual_from_db(StorageId::Individuals, id, iraw),
             EStorage::LMDB(s) => s.get_individual_from_db(StorageId::Individuals, id, iraw),
             EStorage::REMOTE(s) => s.get_individual_from_db(StorageId::Individuals, id, iraw),
+            _ => { false }
         }
     }
 
@@ -73,6 +81,7 @@ impl VStorage {
             EStorage::TT(s) => s.get_individual_from_db(storage, id, iraw),
             EStorage::LMDB(s) => s.get_individual_from_db(storage, id, iraw),
             EStorage::REMOTE(s) => s.get_individual_from_db(storage, id, iraw),
+            _ => { false }
         }
     }
 
@@ -81,6 +90,7 @@ impl VStorage {
             EStorage::TT(s) => s.get_v(storage, id),
             EStorage::LMDB(s) => s.get_v(storage, id),
             EStorage::REMOTE(_s) => None,
+            _ => { None }
         }
     }
 
@@ -89,6 +99,7 @@ impl VStorage {
             EStorage::TT(s) => s.get_raw(storage, id),
             EStorage::LMDB(s) => s.get_raw(storage, id),
             EStorage::REMOTE(_s) => Default::default(),
+            _ => { Default::default() }
         }
     }
 
@@ -97,6 +108,7 @@ impl VStorage {
             EStorage::TT(s) => s.put_kv(storage, key, val),
             EStorage::LMDB(s) => s.put_kv(storage, key, val),
             EStorage::REMOTE(_s) => false,
+            _ => { false }
         }
     }
 
@@ -105,6 +117,7 @@ impl VStorage {
             EStorage::TT(s) => s.put_kv_raw(storage, key, val),
             EStorage::LMDB(s) => s.put_kv_raw(storage, key, val),
             EStorage::REMOTE(_s) => false,
+            _ => {false }
         }
     }
 
@@ -113,6 +126,7 @@ impl VStorage {
             EStorage::TT(s) => s.remove(storage, key),
             EStorage::LMDB(s) => s.remove(storage, key),
             EStorage::REMOTE(_s) => false,
+            _ => {false }
         }
     }
 }
