@@ -48,13 +48,13 @@ impl VStorage {
         }
     }
 
-    pub fn new_tt(tt_id: String, login: &str, pass: &str) -> VStorage {
+    pub(crate) fn new_tt(tt_id: String, login: &str, pass: &str) -> VStorage {
         VStorage {
             storage: EStorage::TT(TTStorage::new(tt_id, login, pass)),
         }
     }
 
-    pub fn new_lmdb(db_path: &str, mode: StorageMode) -> VStorage {
+    pub(crate) fn new_lmdb(db_path: &str, mode: StorageMode) -> VStorage {
         VStorage {
             storage: EStorage::LMDB(LMDBStorage::new(db_path, mode)),
         }
@@ -131,6 +131,25 @@ pub fn new_ro_storage() -> VStorage {
         VStorage::new_tt(tarantool_addr, "veda6", "123456")
     } else {
         VStorage::new_lmdb("./data", StorageMode::ReadOnly)
+    };
+
+    storage
+}
+
+pub fn new_rw_storage() -> VStorage {
+    let conf = Ini::load_from_file("veda.properties").expect("fail load [veda.properties] file");
+    let section = conf.section(None::<String>).expect("fail parse veda.properties");
+    let tarantool_addr = if let Some(p) = section.get("tarantool_url") {
+        p.to_owned()
+    } else {
+        warn!("param [tarantool_url] not found in veda.properties");
+        "".to_owned()
+    };
+
+    let storage = if !tarantool_addr.is_empty() {
+        VStorage::new_tt(tarantool_addr, "veda6", "123456")
+    } else {
+        VStorage::new_lmdb("./data", StorageMode::ReadWrite)
     };
 
     storage
