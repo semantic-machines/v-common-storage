@@ -1,5 +1,5 @@
 [package]
-name = "v_storage"
+name = "v-common-storage"
 version = "0.1.2"
 authors = ["itiu <ValeriyBushenev@gmail.com>"]
 edition = "2018"
