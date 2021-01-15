@@ -3,6 +3,8 @@ name = "v-common-storage"
 version = "0.1.2"
 authors = ["itiu <ValeriyBushenev@gmail.com>"]
 edition = "2018"
+description = "common part of the veda platform"
+license     = "MIT"
 
 [lib]
 path = "src/lib.rs"
