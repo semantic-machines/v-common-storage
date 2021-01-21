@@ -1,5 +1,5 @@
 use crate::remote_storage_client::StorageROClient;
-use crate::storage::{StorageId, VStorage, new_ro_storage};
+use crate::storage::{StorageId, VStorage, get_storage_use_prop, StorageMode};
 use nng::{Message, Protocol, Socket};
 use std::cell::RefCell;
 use std::str;
@@ -17,7 +17,7 @@ pub fn inproc_storage_manager() -> std::io::Result<()> {
     let ro_storage_url = "inproc://nng/".to_owned() + &Uuid::new_v4().to_hyphenated().to_string();
     STORAGE.lock().unwrap().get_mut().addr = ro_storage_url.to_owned();
 
-    let mut storage = new_ro_storage();
+    let mut storage = get_storage_use_prop(StorageMode::ReadOnly);
 
     let server = Socket::new(Protocol::Rep0)?;
     if let Err(e) = server.listen(&ro_storage_url) {
