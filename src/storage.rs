@@ -2,7 +2,6 @@ use crate::lmdb_storage::LMDBStorage;
 use crate::remote_storage_client::*;
 use crate::tt_storage::TTStorage;
 use v_onto::individual::*;
-use ini::Ini;
 
 pub enum StorageError {
     None,
@@ -129,23 +128,4 @@ impl VStorage {
             _ => {false }
         }
     }
-}
-
-pub fn get_storage_use_prop(mode: StorageMode) -> VStorage {
-    let conf = Ini::load_from_file("veda.properties").expect("fail load [veda.properties] file");
-    let section = conf.section(None::<String>).expect("fail parse veda.properties");
-    let tarantool_addr = if let Some(p) = section.get("tarantool_url") {
-        p.to_owned()
-    } else {
-        warn!("param [tarantool_url] not found in veda.properties");
-        "".to_owned()
-    };
-
-    let storage = if !tarantool_addr.is_empty() {
-        VStorage::new_tt(tarantool_addr, "veda6", "123456")
-    } else {
-        VStorage::new_lmdb("./data", mode)
-    };
-
-    storage
 }
