@@ -7,9 +7,9 @@ use v_onto::parser::*;
 // Remote client
 
 pub struct StorageROClient {
-    pub(crate) soc: Socket,
-    pub(crate) addr: String,
-    pub(crate) is_ready: bool,
+    pub soc: Socket,
+    pub addr: String,
+    pub is_ready: bool,
 }
 
 impl Default for StorageROClient {
