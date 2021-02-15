@@ -1,6 +1,6 @@
 [package]
 name = "v-common-storage"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["itiu <ValeriyBushenev@gmail.com>"]
 edition = "2018"
 description = "common part of the veda platform"
