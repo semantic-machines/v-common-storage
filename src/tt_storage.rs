@@ -1,9 +1,7 @@
 use crate::storage::*;
-use futures::future::Future;
-use rusty_tarantool::tarantool::{Client, ClientConfig};
-use std::net::SocketAddr;
+use rusty_tarantool::tarantool::{Client, ClientConfig, IteratorType};
 use std::str;
-use tokio::runtime::current_thread::Runtime;
+use tokio::runtime::Runtime;
 use v_onto::individual::*;
 use v_onto::parser::*;
 
@@ -18,10 +16,9 @@ const AZ_SPACE_ID: i32 = 514;
 
 impl TTStorage {
     pub fn new(tt_uri: String, login: &str, pass: &str) -> TTStorage {
-        let addr: SocketAddr = tt_uri.parse().unwrap();
         TTStorage {
             rt: Runtime::new().unwrap(),
-            client: ClientConfig::new(addr, login, pass).set_timeout_time_ms(1000).set_reconnect_time_ms(10000).build(),
+            client: ClientConfig::new(tt_uri, login, pass).set_timeout_time_ms(1000).set_reconnect_time_ms(10000).build(),
         }
     }
 }
@@ -37,11 +34,10 @@ impl Storage for TTStorage {
         };
 
         let key = (uri,);
-        let resp = self.client.select(space, 0, &key, 0, 100, 0).and_then(move |response| Ok(response.data));
 
-        match self.rt.block_on(resp) {
+        match self.rt.block_on(self.client.select(space, 0, &key, 0, 100, IteratorType::EQ)) {
             Ok(v) => {
-                iraw.set_raw(&v[5..]);
+                iraw.set_raw(&v.data[5..]);
 
                 if parse_raw(iraw).is_ok() {
                     return true;
@@ -65,9 +61,8 @@ impl Storage for TTStorage {
         };
 
         let tuple = (key,);
-        let resp = self.client.delete(space, &tuple).and_then(move |response| Ok(response.data));
 
-        if let Err(e) = self.rt.block_on(resp) {
+        if let Err(e) = self.rt.block_on(self.client.delete(space, &tuple)) {
             error!("tarantool: fail remove, db [{:?}], err = {:?}", storage, e);
             false
         } else {
@@ -85,9 +80,8 @@ impl Storage for TTStorage {
         };
 
         let tuple = (key, val);
-        let resp = self.client.replace(space, &tuple).and_then(move |response| Ok(response.data));
 
-        if let Err(e) = self.rt.block_on(resp) {
+        if let Err(e) = self.rt.block_on(self.client.replace(space, &tuple)) {
             error!("tarantool: fail replace, db [{:?}], err = {:?}", storage, e);
             false
         } else {
@@ -104,9 +98,7 @@ impl Storage for TTStorage {
             INDIVIDUALS_SPACE_ID
         };
 
-        let resp = self.client.replace_raw(space, val).and_then(move |response| Ok(response.data));
-
-        if let Err(e) = self.rt.block_on(resp) {
+        if let Err(e) = self.rt.block_on(self.client.replace_raw(space, val)) {
             error!("tarantool: fail replace, db [{:?}], err = {:?}", storage, e);
             false
         } else {
@@ -124,10 +116,9 @@ impl Storage for TTStorage {
         };
 
         let key = (key,);
-        let resp = self.client.select(space, 0, &key, 0, 100, 0).and_then(move |response| Ok(response.data));
 
-        if let Ok(v) = self.rt.block_on(resp) {
-            if let Ok(s) = std::str::from_utf8(&v[5..]) {
+        if let Ok(v) = self.rt.block_on(self.client.select(space, 0, &key, 0, 100, IteratorType::EQ)) {
+            if let Ok(s) = std::str::from_utf8(&v.data[5..]) {
                 return Some(s.to_string());
             }
         }
@@ -145,10 +136,9 @@ impl Storage for TTStorage {
         };
 
         let key = (key,);
-        let resp = self.client.select(space, 0, &key, 0, 100, 0).and_then(move |response| Ok(response.data));
 
-        if let Ok(v) = self.rt.block_on(resp) {
-            return v[5..].to_vec();
+        if let Ok(v) = self.rt.block_on(self.client.select(space, 0, &key, 0, 100, IteratorType::EQ)) {
+            return v.data[5..].to_vec();
         }
 
         Vec::default()
