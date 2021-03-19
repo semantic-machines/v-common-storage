@@ -1,6 +1,6 @@
 [package]
 name = "v-common-storage"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["itiu <ValeriyBushenev@gmail.com>"]
 edition = "2018"
 description = "common part of the veda platform"
@@ -11,7 +11,7 @@ path = "src/lib.rs"
 
 [dependencies]
 log = "0.4"
-rusty_tarantool = "0.2.1"
+rusty_tarantool = "0.2.10"
 tokio = { version = "0.2" }
 futures = "0.3.5"
 lmdb-rs-m = "0.7.7"
