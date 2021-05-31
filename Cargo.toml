@@ -1,6 +1,6 @@
 [package]
 name = "v-common-storage"
-version = "0.2.7"
+version = "0.2.8"
 authors = ["itiu <ValeriyBushenev@gmail.com>"]
 edition = "2018"
 description = "common part of the veda platform"
@@ -19,4 +19,4 @@ nng = "0.5.1"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 rust-ini = "0.16"
 
-v_onto = { package = "v-common-onto", version = "=0.1.10" }
+v_onto = { package = "v-common-onto", version = "=0.1.11" }
